@@ -57,6 +57,30 @@ def to_json(outcome: Outcome, indent: int = 2) -> str:
     return json.dumps(to_dict(outcome), indent=indent, ensure_ascii=False)
 
 
+def requirements(outcome: Outcome, decision_id: str) -> list[dict[str, Any]]:
+    """Every fact ``decision_id`` depends on, with how it came out in this execution.
+
+    Solve with ``Coverage.FULL`` first if you need every fact answered, e.g. to
+    list all the reasons an application was not approved, not just the first.
+    """
+    ex = outcome.execution
+    dec = ex.policy.decision(decision_id)
+    if dec is None:
+        raise KeyError(decision_id)
+    out = []
+    for fact_id in ex.policy.facts_in(dec.when):
+        f = ex.policy.facts[fact_id]
+        out.append(
+            {
+                "fact": fact_id,
+                "question": f.question,
+                "value": _tri(ex.effective(fact_id)) if fact_id in ex.verdicts else "NOT ASKED",
+                "source": f.source,
+            }
+        )
+    return out
+
+
 def explain(outcome: Outcome, show_evidence: bool = True) -> str:
     """A plain-text trace a reviewer can read top to bottom."""
     ex = outcome.execution

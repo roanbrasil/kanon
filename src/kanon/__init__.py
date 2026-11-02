@@ -21,7 +21,7 @@ from .oracle import (
 )
 from .policy import ESCALATE, Decision, Fact, Policy, load_policy
 from .solver import Coverage, Execution, Outcome, Resolution, apply, next_questions, solve
-from .trace import explain, to_dict, to_json
+from .trace import explain, requirements, to_dict, to_json
 
 __all__ = [
     "ESCALATE",
@@ -47,6 +47,7 @@ __all__ = [
     "noisy_oracle",
     "ollama_oracle",
     "route",
+    "requirements",
     "solve",
     "table_oracle",
     "to_dict",

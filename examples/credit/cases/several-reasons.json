@@ -1,0 +1,45 @@
+{
+  "case": {
+    "request": {
+      "limit": 110000,
+      "purpose": "Inventory"
+    },
+    "business": {
+      "name": "Boutique Caf\u00e9 Longue Rive",
+      "months_operating": 60,
+      "naics_prefix": "7225"
+    },
+    "financials": {
+      "annual_revenue": 500000,
+      "net_operating_income": 96000,
+      "annual_debt_service": 52000
+    },
+    "bureau": {
+      "score": 648,
+      "delinquencies_12m": [
+        {
+          "days": 90,
+          "creditor": "supplier"
+        }
+      ]
+    },
+    "documents": {
+      "bank_statements": "Jan\u2013Feb deposits: 41,200 / 39,800 CAD.",
+      "tax_filing": "T2 2025 gross receipts: 498,400 CAD."
+    },
+    "policy_tables": {
+      "restricted_naics": [
+        "7132",
+        "5311",
+        "5239"
+      ]
+    }
+  },
+  "expected": "decline_credit",
+  "truth": {
+    "purpose_eligible": true,
+    "tax_filing_matches": true,
+    "statements_consistent": false
+  },
+  "note": "Several reasons at once: score below 660, a 90-day delinquency, request above 15% of revenue, and only two months of statements (the model should answer unknown)."
+}

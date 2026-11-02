@@ -218,3 +218,14 @@ def test_examples_reach_expected_decisions(domain):
         oracle = kanon.route(policy, llm=kanon.table_oracle(answers), human=kanon.table_oracle(answers))
         out = kanon.solve(policy, case.data, oracle)
         assert out.decision == case.expected, f"{domain}/{case.id}: {out.resolution.reason}"
+
+
+def test_requirements_lists_every_fact_of_a_decision():
+    policy = kanon.load_policy(LOAN)
+    oracle = kanon.route(policy, llm=kanon.table_oracle({"stable_income": False}))
+    minimal = kanon.solve(policy, {"score": 600, "down": 0.1}, oracle)
+    full = kanon.solve(policy, {"score": 600, "down": 0.1}, oracle, coverage=kanon.Coverage.FULL)
+    m = {r["fact"]: r["value"] for r in kanon.requirements(minimal, "approve")}
+    f = {r["fact"]: r["value"] for r in kanon.requirements(full, "approve")}
+    assert m["stable_income"] == "NOT ASKED"
+    assert f == {"good_credit": "NO", "stable_income": "NO", "has_down_payment": "NO"}
