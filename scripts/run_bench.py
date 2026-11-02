@@ -68,7 +68,7 @@ def code_only_fraction(policy, cases) -> float:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--n", type=int, default=20)
+    ap.add_argument("--n", type=int, default=50)
     ap.add_argument("--errors", default="0,0.05,0.1,0.15,0.2,0.3")
     ap.add_argument("--out", default="bench")
     ap.add_argument("--seed", type=int, default=0)

@@ -145,7 +145,7 @@ judgment facts (`truth`) and the expected decision, so the examples run offline
 ## Bench
 
 ```bash
-python scripts/run_bench.py --n 20          # simulated answerer, figures in bench/
+python scripts/run_bench.py                  # simulated answerer, 50 trials/case, figures in bench/
 python scripts/live_bench.py examples/credit --llm ollama:qwen2.5:14b --n 10
 ```
 
