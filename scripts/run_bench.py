@@ -57,8 +57,8 @@ def code_only_fraction(policy, cases) -> float:
     for c in cases:
         oracle = kanon.route(
             policy,
-            llm=kanon.table_oracle({k: kanon.Verdict.from_bool(v) for k, v in c.truth.items()}),
-            human=kanon.table_oracle({k: kanon.Verdict.from_bool(v) for k, v in c.truth.items()}),
+            llm=kanon.table_oracle(dict(c.truth)),
+            human=kanon.table_oracle(dict(c.truth)),
         )
         out = kanon.solve(policy, c.data, oracle)
         if all(policy.facts[f].by == "code" for f in out.execution.verdicts):

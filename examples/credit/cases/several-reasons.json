@@ -39,7 +39,7 @@
   "truth": {
     "purpose_eligible": true,
     "tax_filing_matches": true,
-    "statements_consistent": false
+    "statements_consistent": null
   },
   "note": "Several reasons at once: score below 660, a 90-day delinquency, request above 15% of revenue, and only two months of statements (the model should answer unknown)."
 }

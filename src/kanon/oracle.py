@@ -115,7 +115,7 @@ def table_oracle(answers: Mapping[str, Verdict | bool | None], source: str = "ta
 
 
 def noisy_oracle(
-    truth: Mapping[str, bool],
+    truth: Mapping[str, bool | None],
     error_rate: float,
     rng: random.Random,
     confidence_when_wrong: tuple[float, float] = (0.35, 0.85),
@@ -133,6 +133,8 @@ def noisy_oracle(
     def oracle(question: Question, case: Mapping[str, Any]) -> Verdict:
         true_value = truth[question.fact_id]
         wrong = rng.random() < error_rate
+        if true_value is None:  # the honest answer is "cannot tell"
+            return Verdict.unknown("simulated: insufficient evidence", source=source)
         value = (not true_value) if wrong else true_value
         lo, hi = confidence_when_wrong if wrong else confidence_when_right
         return Verdict.from_bool(value, evidence="simulated", confidence=rng.uniform(lo, hi), source=source)

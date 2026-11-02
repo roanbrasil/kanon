@@ -214,7 +214,7 @@ def test_examples_reach_expected_decisions(domain):
     policy = kanon.load_policy(EXAMPLES / domain / "policy.yaml")
     assert not kanon.lint(policy).errors
     for case in load_cases(EXAMPLES / domain):
-        answers = {k: kanon.Verdict.from_bool(v) for k, v in case.truth.items()}
+        answers = {k: (None if v is None else kanon.Verdict.from_bool(v)) for k, v in case.truth.items()}
         oracle = kanon.route(policy, llm=kanon.table_oracle(answers), human=kanon.table_oracle(answers))
         out = kanon.solve(policy, case.data, oracle)
         assert out.decision == case.expected, f"{domain}/{case.id}: {out.resolution.reason}"

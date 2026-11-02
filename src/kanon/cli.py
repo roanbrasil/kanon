@@ -72,7 +72,7 @@ def cmd_solve(args: argparse.Namespace) -> int:
     fixture = None
     if "truth" in doc:
         # offline: answer judgment facts from the fixture's ground truth
-        fixture = table_oracle({k: Verdict.from_bool(v, "fixture ground truth", source="fixture") for k, v in doc["truth"].items()})
+        fixture = table_oracle({k: (Verdict.unknown("fixture: insufficient evidence", source="fixture") if v is None else Verdict.from_bool(v, "fixture ground truth", source="fixture")) for k, v in doc["truth"].items()})
     llm = llm or fixture
     human = cli_oracle if args.interactive else fixture
     oracle = route(policy, llm=llm, human=human)
