@@ -1,0 +1,30 @@
+{
+  "note": "Sensors fine, operator explicitly asks for inspection.",
+  "case": {
+    "robot": "KR-210 cell 7",
+    "limits": {
+      "vibration_warning": 4.5,
+      "vibration_critical": 7.0,
+      "service_interval_hours": 2000
+    },
+    "telemetry": {
+      "vibration_rms": 3.0,
+      "gearbox_temp_delta_c": 2.0,
+      "hours_since_service": 500,
+      "fault_codes": []
+    },
+    "production": {
+      "utilisation": 0.9,
+      "buffer_hours": 4
+    },
+    "inventory": {
+      "gearbox_kit_in_stock": true
+    },
+    "operator_log": "Axis 4 making a grinding noise at the end of every pick. Please stop and inspect before night shift."
+  },
+  "truth": {
+    "operator_reports_abnormal": true,
+    "operator_requests_stop": true
+  },
+  "expected": "stop_now"
+}

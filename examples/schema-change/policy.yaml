@@ -1,0 +1,104 @@
+policy: schema-change-governance
+version: 2
+description: >
+  Decides whether a proposed change to an event schema (Avro / Protobuf / JSON Schema)
+  published on a shared topic may be merged. Structural facts are checked by code
+  from the schema diff; only the questions that need judgment go to a model.
+context: >
+  The case describes a pull request that changes the schema of an event published on a
+  Kafka topic. Consumers of the topic are other teams. Judge each question only from
+  the case; do not infer the organisation's rules.
+abstain_below: 0.7
+
+facts:
+  adds_required_without_default:
+    question: Does the change add a required field that has no default value?
+    by: code
+    check: any(f.required and not f.has_default for f in case.change.added_fields)
+    source: "Contract policy §2.1 — additive changes must be optional or defaulted"
+
+  removes_field:
+    question: Does the change remove a field that exists in the current schema?
+    by: code
+    check: len(case.change.removed_fields) > 0
+    source: "Contract policy §2.2"
+
+  changes_field_type:
+    question: Does the change alter the type of an existing field?
+    by: code
+    check: len(case.change.type_changes) > 0
+    source: "Contract policy §2.2"
+
+  renames_field:
+    question: Does the change rename an existing field?
+    by: code
+    check: len(case.change.renamed_fields) > 0
+    source: "Contract policy §2.2 — renames are a remove plus an add"
+
+  bumps_topic_version:
+    question: Does the change publish to a new major version of the topic?
+    by: code
+    check: case.change.new_topic_version is not None and case.change.new_topic_version > case.topic.version
+    source: "Contract policy §3 — breaking changes ship on a new topic version"
+
+  all_consumers_acknowledged:
+    question: Has every registered consumer of the topic acknowledged the change?
+    by: code
+    check: len(case.consumers) > 0 and all(c.acknowledged for c in case.consumers)
+    source: "Contract policy §3.2"
+
+  touches_pii:
+    question: Does the change add or alter a field tagged as personal data?
+    by: code
+    check: any("pii" in f.get("tags", []) for f in case.change.added_fields + case.change.type_changes)
+    source: "Data protection annex A"
+
+  migration_documented:
+    question: Does the changelog give consumers concrete steps to migrate to the new schema?
+    by: llm
+    guidance: >
+      Concrete means the consumer could act on it without asking: which fields change, what
+      to read instead, by when. A ticket link or "see PR" alone does not count. If the change
+      is additive and optional, a one-line note that nothing is required of consumers counts.
+    source: "Contract policy §3.3"
+
+  removal_justified:
+    question: Does the PR explain why the removed or retyped field is safe to drop, with evidence that no consumer still reads it?
+    by: llm
+    guidance: >
+      Evidence means something checkable: a consumer-side PR, registry lineage, or usage metrics.
+      A statement like "nobody uses this" without support does not count.
+    source: "Contract policy §2.2"
+
+  privacy_signoff:
+    question: Has the privacy officer signed off on the personal-data field?
+    by: human
+    guidance: Look for an explicit approval; a request for review is not an approval.
+    source: "Data protection annex A"
+
+rules:
+  breaking: adds_required_without_default or removes_field or changes_field_type or renames_field
+  coordinated: all_consumers_acknowledged and migration_documented and removal_justified
+
+decisions:
+  - id: reject
+    label: Rejected — breaking change on the current topic version
+    when: breaking and not bumps_topic_version
+    source: "Contract policy §3"
+  - id: privacy_review
+    label: Blocked pending privacy sign-off
+    when: touches_pii and not privacy_signoff
+  - id: review
+    label: Needs contract review — breaking change not fully coordinated
+    when: breaking and bumps_topic_version and not coordinated
+  - id: approve_versioned
+    label: Approved — breaking change on a new topic version, consumers coordinated
+    when: breaking and bumps_topic_version and coordinated
+  - id: approve
+    label: Approved — compatible change
+    when: not breaking and migration_documented
+  - id: approve_undocumented
+    label: Approved with a note — compatible change, changelog is thin
+    when: not breaking and not migration_documented
+
+resolution: first_match

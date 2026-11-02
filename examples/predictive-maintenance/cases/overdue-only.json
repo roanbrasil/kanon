@@ -1,0 +1,30 @@
+{
+  "note": "No degradation signs, but past the service interval.",
+  "case": {
+    "robot": "KR-210 cell 7",
+    "limits": {
+      "vibration_warning": 4.5,
+      "vibration_critical": 7.0,
+      "service_interval_hours": 2000
+    },
+    "telemetry": {
+      "vibration_rms": 2.5,
+      "gearbox_temp_delta_c": 1.0,
+      "hours_since_service": 2300,
+      "fault_codes": []
+    },
+    "production": {
+      "utilisation": 0.6,
+      "buffer_hours": 10
+    },
+    "inventory": {
+      "gearbox_kit_in_stock": true
+    },
+    "operator_log": "Nothing unusual."
+  },
+  "truth": {
+    "operator_reports_abnormal": false,
+    "operator_requests_stop": false
+  },
+  "expected": "service_due"
+}

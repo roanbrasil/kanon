@@ -1,0 +1,30 @@
+{
+  "note": "Everything nominal.",
+  "case": {
+    "robot": "KR-210 cell 7",
+    "limits": {
+      "vibration_warning": 4.5,
+      "vibration_critical": 7.0,
+      "service_interval_hours": 2000
+    },
+    "telemetry": {
+      "vibration_rms": 2.1,
+      "gearbox_temp_delta_c": 1.5,
+      "hours_since_service": 900,
+      "fault_codes": []
+    },
+    "production": {
+      "utilisation": 0.8,
+      "buffer_hours": 6
+    },
+    "inventory": {
+      "gearbox_kit_in_stock": true
+    },
+    "operator_log": "06:10 tool change on A3. 09:40 routine cleaning. Cycle normal all shift."
+  },
+  "truth": {
+    "operator_reports_abnormal": false,
+    "operator_requests_stop": false
+  },
+  "expected": "monitor"
+}

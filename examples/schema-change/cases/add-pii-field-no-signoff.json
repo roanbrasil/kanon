@@ -1,0 +1,42 @@
+{
+  "note": "Additive and optional, but the new field carries personal data and nobody from privacy approved.",
+  "case": {
+    "topic": {
+      "name": "orders.created",
+      "version": 1,
+      "format": "avro",
+      "compatibility": "BACKWARD"
+    },
+    "pr": "#440 add customer_email for receipts",
+    "change": {
+      "added_fields": [
+        {
+          "name": "customer_email",
+          "type": "string",
+          "required": false,
+          "has_default": true,
+          "tags": [
+            "pii"
+          ]
+        }
+      ],
+      "removed_fields": [],
+      "type_changes": [],
+      "renamed_fields": [],
+      "new_topic_version": null
+    },
+    "consumers": [
+      {
+        "team": "billing",
+        "acknowledged": true
+      }
+    ],
+    "changelog": "Adds optional customer_email so billing can send receipts without a lookup. Privacy review requested in DPO-77."
+  },
+  "truth": {
+    "migration_documented": true,
+    "removal_justified": false,
+    "privacy_signoff": false
+  },
+  "expected": "privacy_review"
+}

@@ -1,0 +1,51 @@
+{
+  "note": "Changes a proto without a changelog link.",
+  "case": {
+    "pr": "#1289",
+    "target": "release",
+    "files": [
+      "api/orders.proto",
+      "src/orders/handler.py"
+    ],
+    "diff": {
+      "additions": 70,
+      "deletions": 20
+    },
+    "checks": [
+      {
+        "name": "unit",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "lint",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "docs",
+        "required": false,
+        "status": "failure"
+      }
+    ],
+    "coverage": {
+      "lines": 84,
+      "threshold": 80
+    },
+    "owners": [
+      {
+        "path": "src/",
+        "approved": true
+      }
+    ],
+    "labels": [],
+    "description": "Rename field amount -> total_amount. Revert via git revert."
+  },
+  "truth": {
+    "rollback_plan_present": true,
+    "migration_reversible": false,
+    "api_change_announced": false,
+    "incident_commander_approved": false
+  },
+  "expected": "block_api"
+}

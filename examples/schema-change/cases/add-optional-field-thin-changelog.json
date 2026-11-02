@@ -1,0 +1,40 @@
+{
+  "note": "Same change, changelog says only 'see PR'.",
+  "case": {
+    "topic": {
+      "name": "orders.created",
+      "version": 1,
+      "format": "avro",
+      "compatibility": "BACKWARD"
+    },
+    "pr": "#413 add coupon_code",
+    "change": {
+      "added_fields": [
+        {
+          "name": "coupon_code",
+          "type": "string",
+          "required": false,
+          "has_default": true,
+          "tags": []
+        }
+      ],
+      "removed_fields": [],
+      "type_changes": [],
+      "renamed_fields": [],
+      "new_topic_version": null
+    },
+    "consumers": [
+      {
+        "team": "billing",
+        "acknowledged": false
+      }
+    ],
+    "changelog": "See PR."
+  },
+  "truth": {
+    "migration_documented": false,
+    "removal_justified": false,
+    "privacy_signoff": false
+  },
+  "expected": "approve_undocumented"
+}

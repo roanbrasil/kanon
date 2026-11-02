@@ -1,0 +1,44 @@
+{
+  "note": "A required field without default is breaking for BACKWARD readers.",
+  "case": {
+    "topic": {
+      "name": "orders.created",
+      "version": 1,
+      "format": "avro",
+      "compatibility": "BACKWARD"
+    },
+    "pr": "#450 add currency (required)",
+    "change": {
+      "added_fields": [
+        {
+          "name": "currency",
+          "type": "string",
+          "required": true,
+          "has_default": false,
+          "tags": []
+        }
+      ],
+      "removed_fields": [],
+      "type_changes": [],
+      "renamed_fields": [],
+      "new_topic_version": null
+    },
+    "consumers": [
+      {
+        "team": "billing",
+        "acknowledged": true
+      },
+      {
+        "team": "analytics",
+        "acknowledged": true
+      }
+    ],
+    "changelog": "Adds required currency field. All consumers updated."
+  },
+  "truth": {
+    "migration_documented": false,
+    "removal_justified": false,
+    "privacy_signoff": false
+  },
+  "expected": "reject"
+}

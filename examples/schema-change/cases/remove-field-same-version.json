@@ -1,0 +1,37 @@
+{
+  "note": "Removing a field on the current topic version is rejected regardless of documentation.",
+  "case": {
+    "topic": {
+      "name": "orders.created",
+      "version": 1,
+      "format": "avro",
+      "compatibility": "BACKWARD"
+    },
+    "pr": "#420 drop legacy_customer_ref",
+    "change": {
+      "added_fields": [],
+      "removed_fields": [
+        {
+          "name": "legacy_customer_ref",
+          "type": "string"
+        }
+      ],
+      "type_changes": [],
+      "renamed_fields": [],
+      "new_topic_version": null
+    },
+    "consumers": [
+      {
+        "team": "billing",
+        "acknowledged": true
+      }
+    ],
+    "changelog": "Drops legacy_customer_ref. Billing confirmed they migrated to customer_id in billing#88 last sprint; registry lineage shows no other reader."
+  },
+  "truth": {
+    "migration_documented": true,
+    "removal_justified": true,
+    "privacy_signoff": false
+  },
+  "expected": "reject"
+}

@@ -1,0 +1,51 @@
+{
+  "note": "Adds a migration; description promises nothing about rollback.",
+  "case": {
+    "pr": "#1289",
+    "target": "release",
+    "files": [
+      "migrations/0042_add_index.sql",
+      "src/orders/repo.py"
+    ],
+    "diff": {
+      "additions": 60,
+      "deletions": 5
+    },
+    "checks": [
+      {
+        "name": "unit",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "lint",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "docs",
+        "required": false,
+        "status": "failure"
+      }
+    ],
+    "coverage": {
+      "lines": 84,
+      "threshold": 80
+    },
+    "owners": [
+      {
+        "path": "src/",
+        "approved": true
+      }
+    ],
+    "labels": [],
+    "description": "Adds an index on orders(customer_id). Should be fine."
+  },
+  "truth": {
+    "rollback_plan_present": false,
+    "migration_reversible": false,
+    "api_change_announced": false,
+    "incident_commander_approved": false
+  },
+  "expected": "block_migration"
+}

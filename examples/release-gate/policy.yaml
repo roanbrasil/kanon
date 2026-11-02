@@ -1,0 +1,101 @@
+policy: release-gate
+version: 1
+description: >
+  Decides whether a pull request may be merged to the release branch. CI facts
+  come from the PR's status checks; the model reads the PR description for the
+  parts a status check cannot see (rollback plan, migration notes).
+context: >
+  The case is a pull request against the release branch of a service that owns a
+  production database. Judge each question only from the case fields and the PR text.
+abstain_below: 0.7
+
+facts:
+  ci_green:
+    question: Did every required CI check pass on the latest commit?
+    by: code
+    check: all(c.status == "success" for c in case.checks if c.required)
+    source: "Release process §1"
+  coverage_ok:
+    question: Is line coverage at or above the repository threshold?
+    by: code
+    check: case.coverage.lines >= case.coverage.threshold
+    source: "Release process §1"
+  approved_by_owner:
+    question: Has a code owner of every touched directory approved the PR?
+    by: code
+    check: all(o.approved for o in case.owners)
+    source: "Release process §2"
+  touches_migration:
+    question: Does the PR change a database migration?
+    by: code
+    check: any(f.startswith("migrations/") for f in case.files)
+    source: "Release process §3"
+  touches_public_api:
+    question: Does the PR change the public API surface?
+    by: code
+    check: any(f.startswith("api/") or f.endswith(".proto") for f in case.files)
+    source: "Release process §4"
+  large_change:
+    question: Does the PR change more than 800 lines?
+    by: code
+    check: case.diff.additions + case.diff.deletions > 800
+    source: "Release process §2.1"
+  is_hotfix:
+    question: Is the PR labelled as a hotfix?
+    by: code
+    check: '"hotfix" in case.labels'
+    source: "Release process §5"
+  rollback_plan_present:
+    question: Does the PR description give a concrete rollback plan?
+    by: llm
+    guidance: >
+      Concrete: which command, flag or revert restores the previous behaviour, and whether
+      data written in between survives. "Revert the PR" alone counts only if the PR has no
+      migration. "We'll handle it if needed" does not count.
+    source: "Release process §3"
+  migration_reversible:
+    question: Does the PR state that the migration is backward-compatible or reversible, and say how?
+    by: llm
+    guidance: >
+      Look for an explicit down-migration, an expand/contract plan, or a statement that
+      the change is additive (new nullable column, new table). Silence means no.
+    source: "Release process §3"
+  api_change_announced:
+    question: Does the PR link to a deprecation notice or changelog entry for the API change?
+    by: llm
+    guidance: A link to a changelog entry, RFC or deprecation notice. A mention in a commit message does not count.
+    source: "Release process §4"
+  incident_commander_approved:
+    question: Has the on-call incident commander approved this hotfix?
+    by: human
+    source: "Release process §5"
+
+rules:
+  basics: ci_green and coverage_ok and approved_by_owner
+  migration_safe: not touches_migration or (migration_reversible and rollback_plan_present)
+  api_safe: not touches_public_api or api_change_announced
+
+decisions:
+  - id: block_ci
+    label: Blocked — CI or coverage not green
+    when: not ci_green or not coverage_ok
+  - id: hotfix
+    label: Merged as hotfix — incident commander approved
+    when: is_hotfix and incident_commander_approved
+  - id: block_owner
+    label: Blocked — missing code-owner approval
+    when: not approved_by_owner
+  - id: block_migration
+    label: Blocked — migration without reversible plan
+    when: touches_migration and not migration_safe
+  - id: block_api
+    label: Blocked — public API change not announced
+    when: touches_public_api and not api_safe
+  - id: review_large
+    label: Second reviewer required — large change
+    when: basics and large_change
+  - id: merge
+    label: Merge
+    when: basics and migration_safe and api_safe
+
+resolution: first_match

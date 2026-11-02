@@ -1,0 +1,51 @@
+{
+  "note": "Migration with an explicit expand/contract plan and rollback.",
+  "case": {
+    "pr": "#1289",
+    "target": "release",
+    "files": [
+      "migrations/0043_add_currency.sql",
+      "src/orders/model.py"
+    ],
+    "diff": {
+      "additions": 90,
+      "deletions": 12
+    },
+    "checks": [
+      {
+        "name": "unit",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "lint",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "docs",
+        "required": false,
+        "status": "failure"
+      }
+    ],
+    "coverage": {
+      "lines": 84,
+      "threshold": 80
+    },
+    "owners": [
+      {
+        "path": "src/",
+        "approved": true
+      }
+    ],
+    "labels": [],
+    "description": "Expand step: adds nullable column currency with default 'CAD'; contract step ships next sprint. Rollback: `make db-down 0043` drops the column; rows written meanwhile keep working because readers ignore the column until the contract step."
+  },
+  "truth": {
+    "rollback_plan_present": true,
+    "migration_reversible": true,
+    "api_change_announced": false,
+    "incident_commander_approved": false
+  },
+  "expected": "merge"
+}

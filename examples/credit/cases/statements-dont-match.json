@@ -1,0 +1,40 @@
+{
+  "note": "Application says 500k; deposits suggest ~300k.",
+  "case": {
+    "request": {
+      "limit": 60000,
+      "purpose": "Inventory"
+    },
+    "business": {
+      "name": "Boutique Caf\u00e9 Longue Rive",
+      "months_operating": 60,
+      "naics_prefix": "7225"
+    },
+    "financials": {
+      "annual_revenue": 500000,
+      "net_operating_income": 96000,
+      "annual_debt_service": 52000
+    },
+    "bureau": {
+      "score": 748,
+      "delinquencies_12m": []
+    },
+    "documents": {
+      "bank_statements": "Jan\u2013Jun deposits: 25,100 / 24,300 / 26,800 / 25,900 / 24,200 / 25,700 CAD (total 152,000 over 6 months).",
+      "tax_filing": "T2 2025 gross receipts: 498,400 CAD."
+    },
+    "policy_tables": {
+      "restricted_naics": [
+        "7132",
+        "5311",
+        "5239"
+      ]
+    }
+  },
+  "truth": {
+    "statements_consistent": false,
+    "tax_filing_matches": true,
+    "purpose_eligible": true
+  },
+  "expected": "refer_documents"
+}

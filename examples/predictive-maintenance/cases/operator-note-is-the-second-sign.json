@@ -1,0 +1,30 @@
+{
+  "note": "Only one sensor sign; the operator log supplies the second.",
+  "case": {
+    "robot": "KR-210 cell 7",
+    "limits": {
+      "vibration_warning": 4.5,
+      "vibration_critical": 7.0,
+      "service_interval_hours": 2000
+    },
+    "telemetry": {
+      "vibration_rms": 4.8,
+      "gearbox_temp_delta_c": 2.0,
+      "hours_since_service": 800,
+      "fault_codes": []
+    },
+    "production": {
+      "utilisation": 0.85,
+      "buffer_hours": 5
+    },
+    "inventory": {
+      "gearbox_kit_in_stock": false
+    },
+    "operator_log": "Arm jerks slightly when it approaches the fixture, happened three times, had to reset twice. Kept running."
+  },
+  "truth": {
+    "operator_reports_abnormal": true,
+    "operator_requests_stop": false
+  },
+  "expected": "escalate_planning"
+}

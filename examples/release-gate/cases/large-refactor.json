@@ -1,0 +1,52 @@
+{
+  "note": "Green and approved but 1,400 lines.",
+  "case": {
+    "pr": "#1289",
+    "target": "release",
+    "files": [
+      "src/orders/service.py",
+      "src/orders/repo.py",
+      "src/orders/model.py"
+    ],
+    "diff": {
+      "additions": 900,
+      "deletions": 520
+    },
+    "checks": [
+      {
+        "name": "unit",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "lint",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "docs",
+        "required": false,
+        "status": "failure"
+      }
+    ],
+    "coverage": {
+      "lines": 84,
+      "threshold": 80
+    },
+    "owners": [
+      {
+        "path": "src/",
+        "approved": true
+      }
+    ],
+    "labels": [],
+    "description": "Refactor repository layer. Revert via git revert."
+  },
+  "truth": {
+    "rollback_plan_present": true,
+    "migration_reversible": false,
+    "api_change_announced": false,
+    "incident_commander_approved": false
+  },
+  "expected": "review_large"
+}

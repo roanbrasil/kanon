@@ -1,0 +1,51 @@
+{
+  "note": "Small, green, approved, no migration, no API change.",
+  "case": {
+    "pr": "#1289",
+    "target": "release",
+    "files": [
+      "src/orders/service.py",
+      "tests/test_service.py"
+    ],
+    "diff": {
+      "additions": 120,
+      "deletions": 30
+    },
+    "checks": [
+      {
+        "name": "unit",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "lint",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "docs",
+        "required": false,
+        "status": "failure"
+      }
+    ],
+    "coverage": {
+      "lines": 84,
+      "threshold": 80
+    },
+    "owners": [
+      {
+        "path": "src/",
+        "approved": true
+      }
+    ],
+    "labels": [],
+    "description": "Fix rounding in order totals. Revert is a plain git revert."
+  },
+  "truth": {
+    "rollback_plan_present": true,
+    "migration_reversible": false,
+    "api_change_announced": false,
+    "incident_commander_approved": false
+  },
+  "expected": "merge"
+}

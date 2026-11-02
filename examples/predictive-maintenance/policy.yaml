@@ -1,0 +1,85 @@
+policy: robot-maintenance-intervention
+version: 1
+description: >
+  Decides what to do with an industrial robot cell after a condition-monitoring
+  cycle: stop it now, schedule a maintenance window, keep monitoring, or escalate.
+  Sensor thresholds are checked by code against the telemetry summary; the model
+  only reads the free-text operator log.
+context: >
+  The case is one robot arm on a manufacturing line. Telemetry fields are already
+  aggregated over the last shift. The operator log is free text written by line staff.
+  Judge each question strictly from the case.
+abstain_below: 0.7
+
+facts:
+  vibration_critical:
+    question: Is the joint vibration RMS above the critical limit for this model?
+    by: code
+    check: case.telemetry.vibration_rms >= case.limits.vibration_critical
+    source: "Maintenance SOP 4.1"
+  vibration_elevated:
+    question: Is the joint vibration RMS above the warning limit?
+    by: code
+    check: case.telemetry.vibration_rms >= case.limits.vibration_warning
+    source: "Maintenance SOP 4.1"
+  temperature_rising:
+    question: Has the gearbox temperature risen more than 8 °C over the shift?
+    by: code
+    check: case.telemetry.gearbox_temp_delta_c > 8
+    source: "Maintenance SOP 4.2"
+  overdue_service:
+    question: Is the robot past its scheduled service interval?
+    by: code
+    check: case.telemetry.hours_since_service > case.limits.service_interval_hours
+    source: "Maintenance SOP 2"
+  fault_codes_present:
+    question: Did the controller log any hard fault code this shift?
+    by: code
+    check: len(case.telemetry.fault_codes) > 0
+    source: "Maintenance SOP 4.3"
+  line_at_capacity:
+    question: Is the line currently running at full capacity with no buffer stock?
+    by: code
+    check: case.production.utilisation >= 0.95 and case.production.buffer_hours < 2
+    source: "Production planning note P-12"
+  operator_reports_abnormal:
+    question: Does the operator log describe abnormal noise, smell, jerky motion or repeated manual resets this shift?
+    by: llm
+    guidance: >
+      Only this shift's entries count. Routine notes (tool change, cleaning, normal cycle)
+      are not abnormal. A single manual reset is not "repeated".
+    source: "Maintenance SOP 4.4"
+  operator_requests_stop:
+    question: Does the operator log explicitly ask for the cell to be stopped or inspected?
+    by: llm
+    guidance: An explicit request. "Keep an eye on it" is not a request to stop.
+    source: "Maintenance SOP 4.4"
+  spare_parts_available:
+    question: Are the wear parts for this joint in stock on site?
+    by: code
+    check: case.inventory.gearbox_kit_in_stock
+    source: "Spares policy"
+
+rules:
+  hard_evidence: vibration_critical or fault_codes_present
+  soft_evidence: count(vibration_elevated, temperature_rising, operator_reports_abnormal) >= 2
+
+decisions:
+  - id: stop_now
+    label: Stop the cell now and inspect
+    when: hard_evidence or operator_requests_stop
+    source: "Maintenance SOP 4.1/4.3"
+  - id: escalate_planning
+    label: Escalate to planning — degradation signs but parts missing or line at capacity
+    when: soft_evidence and (not spare_parts_available or line_at_capacity)
+  - id: schedule_48h
+    label: Schedule maintenance within 48 h
+    when: soft_evidence
+  - id: service_due
+    label: Book routine service at next window
+    when: overdue_service
+  - id: monitor
+    label: Keep monitoring
+    when: not soft_evidence and not overdue_service
+
+resolution: first_match

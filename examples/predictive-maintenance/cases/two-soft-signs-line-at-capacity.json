@@ -1,0 +1,30 @@
+{
+  "note": "Same signs, but the line has no buffer.",
+  "case": {
+    "robot": "KR-210 cell 7",
+    "limits": {
+      "vibration_warning": 4.5,
+      "vibration_critical": 7.0,
+      "service_interval_hours": 2000
+    },
+    "telemetry": {
+      "vibration_rms": 5.1,
+      "gearbox_temp_delta_c": 9.5,
+      "hours_since_service": 1500,
+      "fault_codes": []
+    },
+    "production": {
+      "utilisation": 0.98,
+      "buffer_hours": 0.5
+    },
+    "inventory": {
+      "gearbox_kit_in_stock": true
+    },
+    "operator_log": "Smooth cycle."
+  },
+  "truth": {
+    "operator_reports_abnormal": false,
+    "operator_requests_stop": false
+  },
+  "expected": "escalate_planning"
+}

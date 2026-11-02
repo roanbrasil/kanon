@@ -1,0 +1,44 @@
+{
+  "note": "Additive, optional, consumers told nothing is required of them.",
+  "case": {
+    "topic": {
+      "name": "orders.created",
+      "version": 1,
+      "format": "avro",
+      "compatibility": "BACKWARD"
+    },
+    "pr": "#412 add coupon_code",
+    "change": {
+      "added_fields": [
+        {
+          "name": "coupon_code",
+          "type": "string",
+          "required": false,
+          "has_default": true,
+          "tags": []
+        }
+      ],
+      "removed_fields": [],
+      "type_changes": [],
+      "renamed_fields": [],
+      "new_topic_version": null
+    },
+    "consumers": [
+      {
+        "team": "billing",
+        "acknowledged": false
+      },
+      {
+        "team": "analytics",
+        "acknowledged": false
+      }
+    ],
+    "changelog": "Adds optional field coupon_code (default null). No action required from consumers; the field is only populated for promotional orders."
+  },
+  "truth": {
+    "migration_documented": true,
+    "removal_justified": false,
+    "privacy_signoff": false
+  },
+  "expected": "approve"
+}

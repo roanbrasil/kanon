@@ -1,0 +1,52 @@
+{
+  "note": "Hotfix label but no IC approval, and no owner approval either.",
+  "case": {
+    "pr": "#1289",
+    "target": "release",
+    "files": [
+      "src/orders/service.py"
+    ],
+    "diff": {
+      "additions": 8,
+      "deletions": 2
+    },
+    "checks": [
+      {
+        "name": "unit",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "lint",
+        "required": true,
+        "status": "success"
+      },
+      {
+        "name": "docs",
+        "required": false,
+        "status": "failure"
+      }
+    ],
+    "coverage": {
+      "lines": 84,
+      "threshold": 80
+    },
+    "owners": [
+      {
+        "path": "src/",
+        "approved": false
+      }
+    ],
+    "labels": [
+      "hotfix"
+    ],
+    "description": "Null check on empty cart. Pinged IC."
+  },
+  "truth": {
+    "rollback_plan_present": true,
+    "migration_reversible": false,
+    "api_change_announced": false,
+    "incident_commander_approved": false
+  },
+  "expected": "block_owner"
+}

@@ -1,0 +1,94 @@
+policy: small-business-credit-line
+version: 1
+description: >
+  Decides a small-business credit-line application: approve, approve with a reduced
+  limit, refer to an underwriter, or decline. Ratios are computed by code from the
+  application; the model reads the uploaded documents for consistency.
+context: >
+  The case is a credit-line application from a small business. Numeric fields come from
+  the application form and the bureau pull. The documents section holds short extracts of
+  the uploaded bank statements and tax filing. Judge each question only from the case.
+abstain_below: 0.7
+
+facts:
+  score_strong:
+    question: Is the business credit score 720 or above?
+    by: code
+    check: case.bureau.score >= 720
+    source: "Credit policy CL-3.1"
+  score_acceptable:
+    question: Is the business credit score 660 or above?
+    by: code
+    check: case.bureau.score >= 660
+    source: "Credit policy CL-3.1"
+  dscr_ok:
+    question: Is the debt-service coverage ratio at least 1.25?
+    by: code
+    check: case.financials.net_operating_income / case.financials.annual_debt_service >= 1.25
+    source: "Credit policy CL-3.2"
+  requested_within_limit:
+    question: Is the requested limit at most 15% of annual revenue?
+    by: code
+    check: case.request.limit <= 0.15 * case.financials.annual_revenue
+    source: "Credit policy CL-3.3"
+  operating_two_years:
+    question: Has the business been operating for at least 24 months?
+    by: code
+    check: case.business.months_operating >= 24
+    source: "Credit policy CL-2"
+  recent_delinquency:
+    question: Does the bureau report a delinquency of 60+ days in the last 12 months?
+    by: code
+    check: any(d.days >= 60 for d in case.bureau.delinquencies_12m)
+    source: "Credit policy CL-3.4"
+  restricted_industry:
+    question: Is the business in a restricted industry?
+    by: code
+    check: case.business.naics_prefix in case.policy_tables.restricted_naics
+    source: "Credit policy CL-1"
+  statements_consistent:
+    question: Do the bank statement extracts support the revenue stated on the application (within 15%)?
+    by: llm
+    guidance: >
+      Compare deposits over the period with the stated annual revenue, pro-rated. Within 15%
+      is consistent. If the extract covers less than three months, answer unknown.
+    source: "Credit policy CL-4.1"
+  tax_filing_matches:
+    question: Does the tax filing extract report revenue consistent with the application (within 15%)?
+    by: llm
+    guidance: Compare gross receipts on the filing with stated annual revenue. If no filing extract is present, answer unknown.
+    source: "Credit policy CL-4.2"
+  purpose_eligible:
+    question: Is the stated purpose of funds an eligible working-capital use?
+    by: llm
+    guidance: >
+      Eligible: inventory, payroll, receivables gaps, equipment under 25k. Not eligible:
+      refinancing personal debt, real estate purchase, investing in securities.
+    source: "Credit policy CL-1.2"
+
+rules:
+  eligible: operating_two_years and not restricted_industry and purpose_eligible
+  documents_ok: statements_consistent and tax_filing_matches
+  prime: score_strong and dscr_ok and requested_within_limit and not recent_delinquency
+
+decisions:
+  - id: decline_ineligible
+    label: Declined — ineligible
+    when: not eligible
+  - id: decline_credit
+    label: Declined — credit criteria not met
+    when: not score_acceptable or recent_delinquency
+  - id: approve
+    label: Approved at requested limit
+    when: prime and documents_ok
+  - id: approve_reduced
+    label: Approved at a reduced limit
+    when: score_acceptable and dscr_ok and documents_ok and not requested_within_limit
+  - id: refer
+    label: Referred to an underwriter
+    when: score_acceptable and documents_ok
+  - id: refer_documents
+    label: Referred — documents do not support the application
+    when: not documents_ok
+
+resolution: first_match

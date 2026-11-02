@@ -1,0 +1,43 @@
+{
+  "note": "Type change on a new version, but one consumer has not acknowledged.",
+  "case": {
+    "topic": {
+      "name": "orders.created",
+      "version": 1,
+      "format": "avro",
+      "compatibility": "BACKWARD"
+    },
+    "pr": "#430 amount as decimal",
+    "change": {
+      "added_fields": [],
+      "removed_fields": [],
+      "type_changes": [
+        {
+          "name": "amount",
+          "from": "double",
+          "to": "bytes(decimal)",
+          "tags": []
+        }
+      ],
+      "renamed_fields": [],
+      "new_topic_version": 2
+    },
+    "consumers": [
+      {
+        "team": "billing",
+        "acknowledged": true
+      },
+      {
+        "team": "analytics",
+        "acknowledged": false
+      }
+    ],
+    "changelog": "v2 encodes amount as Avro decimal (bytes, precision 18 scale 2). Consumers must decode with the logical type; sample code in docs/decimal.md. v1 remains until Q1."
+  },
+  "truth": {
+    "migration_documented": true,
+    "removal_justified": true,
+    "privacy_signoff": false
+  },
+  "expected": "review"
+}

@@ -1,0 +1,40 @@
+{
+  "note": "Casino supplies NAICS 7132.",
+  "case": {
+    "request": {
+      "limit": 50000,
+      "purpose": "Inventory"
+    },
+    "business": {
+      "name": "Boutique Caf\u00e9 Longue Rive",
+      "months_operating": 80,
+      "naics_prefix": "7132"
+    },
+    "financials": {
+      "annual_revenue": 600000,
+      "net_operating_income": 120000,
+      "annual_debt_service": 40000
+    },
+    "bureau": {
+      "score": 760,
+      "delinquencies_12m": []
+    },
+    "documents": {
+      "bank_statements": "Jan\u2013Jun deposits: 41,200 / 39,800 / 44,100 / 42,650 / 40,900 / 43,300 CAD (total 251,950 over 6 months).",
+      "tax_filing": "T2 2025 gross receipts: 498,400 CAD."
+    },
+    "policy_tables": {
+      "restricted_naics": [
+        "7132",
+        "5311",
+        "5239"
+      ]
+    }
+  },
+  "truth": {
+    "statements_consistent": true,
+    "tax_filing_matches": true,
+    "purpose_eligible": true
+  },
+  "expected": "decline_ineligible"
+}
