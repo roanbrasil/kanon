@@ -152,8 +152,8 @@ python scripts/live_bench.py examples/credit --llm ollama:qwen2.5:14b --n 10
 The simulated answerer only touches `llm`/`human` facts and is wrong with
 probability ε on each. Code facts always run their real check, so a case
 decided through code alone is right every time — pass^k flattens at the
-share of such cases as k grows. See `bench/results.json` for the numbers
-behind the figures.
+share of such cases as k grows. The script writes the numbers behind
+the figures to `bench/results.json`.
 
 ## Not in scope (yet)
 

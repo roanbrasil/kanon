@@ -4,4 +4,4 @@ __pycache__/
 build/
 dist/
 examples/*/live_results.json
-bench/*.png
+bench/
